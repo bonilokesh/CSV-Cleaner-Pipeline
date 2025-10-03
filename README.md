@@ -1,6 +1,6 @@
 # CSV Cleaner Pipeline
 
-A simple data pipeline web application built using **Flask**, **Pandas**, and **HTML/CSS**.  
+A simple data pipeline web application built using **Flask**, **Pandas**, and **HTML**.  
 This app allows users to upload a CSV file, select the cleaning operations they want to perform, and then download the cleaned CSV file.
 
 ---
