@@ -1,12 +1,12 @@
 # CSV Cleaner Pipeline
 
 A simple data pipeline web application built using **Flask**, **Pandas**, and **HTML**.  
-This app allows users to upload a CSV file, select the cleaning operations they want to perform, and then download the cleaned CSV file.
+This app allows users to upload a CSV, XLS OR XLSX file, select the cleaning operations they want to perform, and then download the cleaned CSV file.
 
 ---
 
 ##  Features
-- Upload a CSV file via the frontend.
+- Upload a CSV, XLS , XLSX file via the frontend.
 - Choose data cleaning options such as:
   - Remove duplicates
   - Handle missing values
