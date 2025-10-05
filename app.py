@@ -6,6 +6,12 @@ import io
 app = Flask(__name__)
 app.secret_key = 'iamlokesh'
 
+allowed = {'csv' ,'xlsx' , 'xls'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed
+
+
 def perform_cleaning(df , operations , missing_strategy):
     df_cleaned = df.copy()
     if 'remove_duplicates' in operations:
@@ -43,20 +49,26 @@ def index():
 
 @app.route('/clean' , methods=['POST'])
 def clean():
-    if 'csv_file' not in request.files:
+    if 'file' not in request.files:
         flash('No file part in the request')
         return redirect(url_for('index'))
     
-    file = request.files['csv_file']
+    file = request.files['file']
     if file.filename == '':
         flash('No selected file')
         return redirect(url_for('index'))
     
-    if file and file.filename.endswith('.csv'):
+    if file and allowed_file(file.filename):
         try:
-            df = pd.read_csv(file)
+            filename = file.filename
+            df = None
+            if filename.lower().endswith('.csv'):
+                df = pd.read_csv(file)
+            elif filename.lower().endswith(('.xlsx' , '.xls')):
+                df = pd.read_excel(file)
+            
             operations = request.form.getlist('operations')
-            missing_strategy = request.form.get('missing_strategy') 
+            missing_strategy = request.form.get('missing_strategy' , 'remove_row') 
             df_cleaned = perform_cleaning(df, operations, missing_strategy)
             buffer = io.StringIO()
             df_cleaned.to_csv(buffer, index=False)
@@ -67,7 +79,7 @@ def clean():
             mem_file.seek(0)
 
             # Create the name for the downloaded file
-            original_filename = os.path.splitext(file.filename)[0]
+            original_filename = os.path.splitext(filename)[0]
             download_filename = f"cleaned_{original_filename}.csv"
 
             # Send the buffer as a file download
@@ -82,7 +94,7 @@ def clean():
             flash(f'Error processing file: {e}')
             return redirect(url_for('index'))
     else:
-        flash('Invalid file format. Please upload a CSV file.')
+        flash('Invalid file format. Please upload a CSV or Excel file.')
         return redirect(url_for('index'))
     
 if __name__ == '__main__':
